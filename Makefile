@@ -33,7 +33,7 @@ validate-corners: check-pdk-root
 	@bash scripts/validate_corners.sh
 
 check-coverage:
-	@echo "[check-coverage] Not yet implemented — skipping."
+	@python3 scripts/check_coverage.py
 
 corners: check-pdk-root validate-corners
 	@echo "[corners] Running PVT corner sweep (30 corners × 5 testbenches)..."
