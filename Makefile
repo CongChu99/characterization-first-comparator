@@ -35,8 +35,11 @@ validate-corners: check-pdk-root
 check-coverage:
 	@echo "[check-coverage] Not yet implemented — skipping."
 
-corners: check-pdk-root
-	@echo "[corners] Not yet implemented — skipping."
+corners: check-pdk-root validate-corners
+	@echo "[corners] Running PVT corner sweep (30 corners × 5 testbenches)..."
+	@mkdir -p results/corners
+	@bash scripts/run_corners.sh
+	@echo "[corners] Done. See results/corners/"
 
 mc: check-pdk-root
 	@echo "[mc] Not yet implemented — skipping."
