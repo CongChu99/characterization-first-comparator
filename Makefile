@@ -57,7 +57,13 @@ extract: check-pdk-root
 	@echo "[extract] Done. See results/extracted/"
 
 report:
-	@echo "[report] Not yet implemented — skipping."
+	@echo "[report] Generating HTML characterization report..."
+	@mkdir -p reports
+	@python3 scripts/report/generate_report.py \
+		--spec specs/comparator_spec.yaml \
+		--extracted-dir results/extracted \
+		--output reports/characterization_report.html
+	@echo "[report] Done. Open reports/characterization_report.html"
 
 # ---------------------------------------------------------------------------
 # Clean — removes results/ only; reports/ is committed and must not be touched

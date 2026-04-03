@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Characterization Report — {{ title }}</title>
+  <style>
+    /* ---- Reset and base ---- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #1a1a2e;
+      background: #f4f6f9;
+    }
+    h1, h2, h3 { font-weight: 600; }
+    a { color: #2563eb; }
+
+    /* ---- Layout ---- */
+    .page { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+
+    /* ---- Header ---- */
+    .report-header {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 32px 36px;
+      margin-bottom: 28px;
+    }
+    .report-header h1 { font-size: 24px; margin-bottom: 4px; }
+    .report-header .meta { font-size: 12px; opacity: 0.85; margin-top: 8px; }
+
+    /* ---- Verdict banner ---- */
+    .verdict-banner {
+      border-radius: 10px;
+      padding: 20px 28px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .verdict-banner.PASS {
+      background: #d1fae5; border-left: 6px solid #10b981; color: #064e3b;
+    }
+    .verdict-banner.FAIL {
+      background: #fee2e2; border-left: 6px solid #ef4444; color: #7f1d1d;
+    }
+    .verdict-icon { font-size: 36px; }
+    .verdict-title { font-size: 22px; font-weight: 700; }
+    .verdict-subtitle { font-size: 13px; margin-top: 4px; }
+    .failure-list { margin-top: 10px; }
+    .failure-list li { font-size: 12px; font-family: monospace; }
+
+    /* ---- Section ---- */
+    .section {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      margin-bottom: 28px;
+      overflow: hidden;
+    }
+    .section-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 15px;
+      font-weight: 600;
+      color: #111827;
+    }
+    .section-body { padding: 0; }
+
+    /* ---- Per-parameter summary cards ---- */
+    .param-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      padding: 16px 24px;
+    }
+    .param-card {
+      border-radius: 8px;
+      padding: 12px 14px;
+      border: 1px solid #e5e7eb;
+    }
+    .param-card.PASS { border-color: #10b981; background: #ecfdf5; }
+    .param-card.FAIL { border-color: #ef4444; background: #fef2f2; }
+    .param-card.UNKNOWN { border-color: #d1d5db; background: #f9fafb; }
+    .param-card-name { font-weight: 600; font-size: 13px; }
+    .param-card-verdict {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-top: 2px;
+    }
+    .param-card.PASS .param-card-verdict { color: #059669; }
+    .param-card.FAIL .param-card-verdict { color: #dc2626; }
+    .param-card-meta { font-size: 11px; color: #6b7280; margin-top: 4px; }
+
+    /* ---- Corner tables ---- */
+    .table-wrap { overflow-x: auto; padding: 0 24px 16px; }
+    table { border-collapse: collapse; width: 100%; min-width: 500px; }
+    th {
+      background: #f1f5f9;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 2px solid #e2e8f0;
+      white-space: nowrap;
+    }
+    td {
+      padding: 6px 10px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 12px;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafafa; }
+
+    .cell-pass { color: #059669; font-weight: 700; }
+    .cell-fail {
+      color: white;
+      background: #dc2626 !important;
+      font-weight: 700;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .cell-null { color: #9ca3af; font-style: italic; }
+
+    /* ---- Spec limits row ---- */
+    .spec-row td { background: #f8fafc; font-size: 11px; color: #64748b; }
+
+    /* ---- MC histograms ---- */
+    .mc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+      padding: 16px 24px;
+    }
+    .mc-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .mc-card-title {
+      padding: 8px 12px;
+      background: #f8fafc;
+      font-size: 12px;
+      font-weight: 600;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .mc-card img, .mc-card .mc-svg {
+      width: 100%;
+      display: block;
+    }
+    .mc-stats {
+      display: flex;
+      gap: 12px;
+      padding: 8px 12px;
+      font-size: 11px;
+      color: #374151;
+      border-top: 1px solid #f1f5f9;
+      flex-wrap: wrap;
+    }
+    .mc-stats span { white-space: nowrap; }
+    .mc-stats .lbl { color: #6b7280; }
+
+    /* ---- Footer ---- */
+    .report-footer {
+      text-align: center;
+      font-size: 11px;
+      color: #9ca3af;
+      padding-top: 24px;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="report-header">
+    <h1>⚡ Characterization Report</h1>
+    <div>{{ title }}</div>
+    <div class="meta">
+      Generated: {{ generated_at }} &nbsp;|&nbsp;
+      PDK: SKY130 &nbsp;|&nbsp;
+      Corners: {{ n_corners }} &nbsp;|&nbsp;
+      Parameters: {{ n_params }}
+    </div>
+  </div>
+
+  <!-- Verdict Banner -->
+  <div class="verdict-banner {{ verdict }}">
+    <div class="verdict-icon">{{ '✅' if verdict == 'PASS' else '❌' }}</div>
+    <div>
+      <div class="verdict-title">Overall: {{ verdict }}</div>
+      <div class="verdict-subtitle">
+        {% if verdict == 'PASS' %}
+          All {{ n_params }} parameters pass across all measured corners.
+        {% else %}
+          {{ failures | length }} failure(s) detected. See details below.
+        {% endif %}
+      </div>
+      {% if failures %}
+      <ul class="failure-list">
+        {% for f in failures %}
+        <li>{{ f }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Parameter Summary Cards -->
+  <div class="section">
+    <div class="section-header">📊 Parameter Summary</div>
+    <div class="section-body">
+      <div class="param-grid">
+        {% for p in parameters %}
+        {% set pverdict = param_verdicts.get(p.name, 'UNKNOWN') %}
+        <div class="param-card {{ pverdict }}">
+          <div class="param-card-name">{{ p.name }}</div>
+          <div class="param-card-verdict">{{ pverdict }}</div>
+          <div class="param-card-meta">
+            {{ p.units }} &nbsp;
+            {% if p.max is not none %}max={{ p.max }}{% endif %}
+            {% if p.min is not none %}min={{ p.min }}{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Per-Parameter Corner Tables -->
+  {% for p in parameters %}
+  {% set corners = results.get(p.name, []) %}
+  <div class="section">
+    <div class="section-header">
+      🔬 {{ p.name }} — {{ p.description if p.description else p.name }}
+      &nbsp;<span style="font-weight:400;font-size:12px;color:#6b7280;">[{{ p.units }}]</span>
+    </div>
+    <div class="section-body">
+      <!-- Spec limits -->
+      <div style="padding:8px 24px 4px;font-size:11px;color:#64748b;">
+        Spec: {% if p.min is not none %}min={{ p.min }} {{ p.units }}{% endif %}
+              {% if p.typ is not none %}typ={{ p.typ }} {{ p.units }}{% endif %}
+              {% if p.max is not none %}max={{ p.max }} {{ p.units }}{% endif %}
+        &nbsp;|&nbsp; Condition: {{ p.condition if p.condition else '—' }}
+      </div>
+      {% if corners %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Corner</th>
+              <th>VDD (V)</th>
+              <th>Temp (°C)</th>
+              <th>Value ({{ p.units }})</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in corners %}
+            <tr>
+              <td>{{ r.corner_tag }}</td>
+              <td>{{ r.vdd if r.vdd is not none else '—' }}</td>
+              <td>{{ r.temp if r.temp is not none else '—' }}</td>
+              <td>
+                {% if r.value is not none %}
+                  {{ "%.4g" | format(r.value) }}
+                {% else %}
+                  <span class="cell-null">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if r.pass == 'PASS' %}
+                  <span class="cell-pass">PASS</span>
+                {% elif r.pass == 'FAIL' %}
+                  <span class="cell-fail">FAIL</span>
+                {% else %}
+                  <span class="cell-null">—</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div style="padding:12px 24px;color:#9ca3af;font-size:12px;">
+        No corner results available for this parameter.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- Monte Carlo Section -->
+  {% if mc %}
+  <div class="section">
+    <div class="section-header">🎲 Monte Carlo Analysis</div>
+    <div class="section-body">
+      <div class="mc-grid">
+        {% for p in parameters %}
+        {% set mc_stat = mc.get(p.name) %}
+        {% set hist_b64 = histograms.get(p.name) %}
+        {% if mc_stat or hist_b64 %}
+        <div class="mc-card">
+          <div class="mc-card-title">{{ p.name }} [{{ p.units }}]</div>
+          {% if hist_b64 %}
+          <img src="data:image/png;base64,{{ hist_b64 }}" alt="MC histogram for {{ p.name }}">
+          {% endif %}
+          {% if mc_stat and mc_stat.n_runs %}
+          <div class="mc-stats">
+            <span><span class="lbl">n=</span>{{ mc_stat.n_runs }}</span>
+            <span><span class="lbl">μ=</span>{{ "%.4g" | format(mc_stat.mean) }}</span>
+            <span><span class="lbl">σ=</span>{{ "%.4g" | format(mc_stat.sigma) }}</span>
+            <span><span class="lbl">min=</span>{{ "%.4g" | format(mc_stat.min) }}</span>
+            <span><span class="lbl">max=</span>{{ "%.4g" | format(mc_stat.max) }}</span>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Footer -->
+  <div class="report-footer">
+    Generated by <strong>characterization-first-comparator</strong> pipeline &nbsp;|&nbsp;
+    SKY130 PDK &nbsp;|&nbsp; {{ generated_at }}
+  </div>
+
+</div>
+</body>
+</html>
