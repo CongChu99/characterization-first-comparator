@@ -30,7 +30,7 @@ validate-spec:
 	python3 scripts/validate_spec.py specs/comparator_spec.yaml
 
 validate-corners: check-pdk-root
-	@echo "[validate-corners] Not yet implemented — skipping."
+	@bash scripts/validate_corners.sh
 
 check-coverage:
 	@echo "[check-coverage] Not yet implemented — skipping."
