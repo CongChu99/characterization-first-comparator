@@ -1,0 +1,73 @@
+* ===========================================================================
+* comparator.spice
+* Static NMOS Differential-Pair Comparator — SKY130 1.8V Process
+* ===========================================================================
+*
+* Topology: NMOS differential pair with PMOS current mirror load
+* Process:  SKY130 (sky130_fd_pr) 1.8V nominal devices
+* VDD:      1.8V
+* Target Idd: ~100µA at TT/27°C with VBIAS ~0.5–0.6V
+*
+* Port list:
+*   INP   — non-inverting input
+*   INN   — inverting input
+*   VDD   — positive supply (1.8V)
+*   VSS   — ground (0V)
+*   OUT   — comparator output (drain of M2/M4)
+*   VBIAS — tail current source gate bias (~0.5–0.6V for ~100µA)
+*
+* Topology diagram:
+*
+*            VDD
+*             |
+*        M3(P)─────M4(P)   PMOS current mirror load (W=4u, L=500n, nf=2)
+*             |         |
+* INP─M1(N)       M2(N)─INN   NMOS diff pair (W=2u, L=500n, nf=2)
+*             |         |
+*              ────M5(P)────   PMOS tail current source (W=8u, L=500n, nf=4)
+*                   |
+*                 VBIAS
+*                   |
+*                  VDD
+*
+* Device sizing table:
+*   Ref  Type   Model                        W     L      nf  ad/as        pd/ps
+*   M1   NFET   sky130_fd_pr__nfet_01v8    2u   500n    2   0.29e-12   2.58u
+*   M2   NFET   sky130_fd_pr__nfet_01v8    2u   500n    2   0.29e-12   2.58u
+*   M3   PFET   sky130_fd_pr__pfet_01v8    4u   500n    2   0.58e-12   4.58u
+*   M4   PFET   sky130_fd_pr__pfet_01v8    4u   500n    2   0.58e-12   4.58u
+*   M5   PFET   sky130_fd_pr__pfet_01v8    8u   500n    4   0.58e-12   4.58u
+*
+* ad/as formula: W/nf * 0.29u
+* pd/ps formula: 2*(W/nf + 0.29u)
+*
+* ===========================================================================
+
+.subckt comparator INP INN VDD VSS OUT VBIAS
+
+* --- PMOS current mirror load ---
+* M3: diode-connected PMOS reference
+* drain=net1, gate=net1 (diode), source=VDD, bulk=VDD
+* W=4u, L=500n, nf=2 => W_per_finger=2u, ad=as=2u*0.29u=0.58e-12, pd=ps=2*(2u+0.29u)=4.58u
+M3 net1 net1 VDD VDD sky130_fd_pr__pfet_01v8 W=4u L=500n nf=2 ad=0.58e-12 as=0.58e-12 pd=4.58u ps=4.58u
+
+* M4: PMOS mirror output
+* drain=OUT, gate=net1, source=VDD, bulk=VDD
+M4 OUT  net1 VDD VDD sky130_fd_pr__pfet_01v8 W=4u L=500n nf=2 ad=0.58e-12 as=0.58e-12 pd=4.58u ps=4.58u
+
+* --- NMOS differential pair ---
+* M1: input+ transistor
+* drain=net1, gate=INP, source=net2 (tail node), bulk=VSS
+* W=2u, L=500n, nf=2 => W_per_finger=1u, ad=as=1u*0.29u=0.29e-12, pd=ps=2*(1u+0.29u)=2.58u
+M1 net1 INP  net2 VSS sky130_fd_pr__nfet_01v8 W=2u L=500n nf=2 ad=0.29e-12 as=0.29e-12 pd=2.58u ps=2.58u
+
+* M2: input- transistor
+* drain=OUT, gate=INN, source=net2 (tail node), bulk=VSS
+M2 OUT  INN  net2 VSS sky130_fd_pr__nfet_01v8 W=2u L=500n nf=2 ad=0.29e-12 as=0.29e-12 pd=2.58u ps=2.58u
+
+* --- PMOS tail current source ---
+* M5: PMOS tail, gate=VBIAS, source=VDD, drain=net2, bulk=VDD
+* W=8u, L=500n, nf=4 => W_per_finger=2u, ad=as=2u*0.29u=0.58e-12, pd=ps=2*(2u+0.29u)=4.58u
+M5 net2 VBIAS VDD VDD sky130_fd_pr__pfet_01v8 W=8u L=500n nf=4 ad=0.58e-12 as=0.58e-12 pd=4.58u ps=4.58u
+
+.ends comparator
