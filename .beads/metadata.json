@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "server",
+  "dolt_database": "characterization_first_comparator",
+  "project_id": "28d8b037-0511-48e9-b269-5fb7300cc336"
+}
