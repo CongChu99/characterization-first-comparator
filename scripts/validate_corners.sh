@@ -27,18 +27,26 @@ if [ -z "${PDK_ROOT:-}" ]; then
     exit 1
 fi
 
-# Detect PDK model library path — try both common layouts
+# Detect PDK model library path — try all known layouts
 PDK_LIB_VOLARE="$PDK_ROOT/libs.ref/sky130_fd_pr/spice/sky130.lib.spice"
 PDK_LIB_OPEN_PDKS="$PDK_ROOT/share/pdk/sky130A/libs.ref/sky130_fd_pr/spice/sky130.lib.spice"
+PDK_LIB_VOLARE_A="$PDK_ROOT/sky130A/libs.tech/ngspice/sky130.lib.spice"
+PDK_LIB_VOLARE_REF="$PDK_ROOT/sky130A/libs.ref/sky130_fd_pr/spice/sky130.lib.spice"
 
 if [ -f "$PDK_LIB_VOLARE" ]; then
     PDK_LIB="$PDK_LIB_VOLARE"
 elif [ -f "$PDK_LIB_OPEN_PDKS" ]; then
     PDK_LIB="$PDK_LIB_OPEN_PDKS"
+elif [ -f "$PDK_LIB_VOLARE_A" ]; then
+    PDK_LIB="$PDK_LIB_VOLARE_A"
+elif [ -f "$PDK_LIB_VOLARE_REF" ]; then
+    PDK_LIB="$PDK_LIB_VOLARE_REF"
 else
     echo "[ERROR] SKY130 model library not found. Tried:" >&2
     echo "        (1) $PDK_LIB_VOLARE" >&2
     echo "        (2) $PDK_LIB_OPEN_PDKS" >&2
+    echo "        (3) $PDK_LIB_VOLARE_A" >&2
+    echo "        (4) $PDK_LIB_VOLARE_REF" >&2
     exit 1
 fi
 
@@ -55,13 +63,24 @@ for i in "${!CORNERS[@]}"; do
     CORNER="${CORNERS[$i]}"
     LABEL="${CORNER_LABELS[$i]}"
 
-    # Generate a per-corner wrapper netlist that overrides .param CORNER
+    # Generate a self-contained per-corner validation netlist
     WRAPPER="$TMPDIR_RUN/corner_${CORNER}.sp"
     cat > "$WRAPPER" <<EOF
-* Auto-generated wrapper for corner: $CORNER
+* Auto-generated corner validation netlist: $CORNER
 .param CORNER=$CORNER
-.param PDK_ROOT="$PDK_ROOT"
-.include $NETLIST
+
+* Load SKY130 model library with this corner
+.lib $PDK_LIB $CORNER
+
+* Minimal test circuit: CMOS inverter-like stage
+M1 vout vg vdd vdd sky130_fd_pr__pfet_01v8 W=1u L=150n
+M2 vout vg gnd gnd sky130_fd_pr__nfet_01v8 W=1u L=150n
+
+Vdd vdd gnd DC 1.8
+Vg  vg  gnd DC 0.9
+
+.op
+.end
 EOF
 
     # Run ngspice in batch mode; capture stdout+stderr

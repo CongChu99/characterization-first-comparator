@@ -3,6 +3,12 @@
 .dolt/
 *.db
 
+.agents
+.beads
+.claude
+AGENTS.md
+docs
+
 # Simulation results — generated; do NOT commit
 results/
 
