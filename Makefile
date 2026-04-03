@@ -27,7 +27,7 @@ characterize: check-pdk-root validate-spec validate-corners check-coverage corne
 # Stub targets — will be filled by later tasks
 # ---------------------------------------------------------------------------
 validate-spec:
-	@echo "[validate-spec] Not yet implemented — skipping."
+	python3 scripts/validate_spec.py specs/comparator_spec.yaml
 
 validate-corners: check-pdk-root
 	@echo "[validate-corners] Not yet implemented — skipping."

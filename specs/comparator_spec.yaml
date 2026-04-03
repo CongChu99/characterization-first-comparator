@@ -1,0 +1,70 @@
+parameters:
+  - name: t_prop_hl
+    description: Propagation delay, output high-to-low transition
+    units: ns
+    min: null
+    typ: 10
+    max: 50
+    condition: "VDD=1.8V, Vin_step=100mV overdrive, CL=10fF, T=27°C"
+    measurement_method: "50% input crossing (rising INP) to 50% output crossing (falling OUT)"
+    testbench: tb/tb_tprop.sp
+
+  - name: t_prop_lh
+    description: Propagation delay, output low-to-high transition
+    units: ns
+    min: null
+    typ: 10
+    max: 50
+    condition: "VDD=1.8V, Vin_step=100mV overdrive, CL=10fF, T=27°C"
+    measurement_method: "50% input crossing (falling INP) to 50% output crossing (rising OUT)"
+    testbench: tb/tb_tprop.sp
+
+  - name: VOS
+    description: Input offset voltage
+    units: mV
+    min: null
+    typ: 0
+    max: 5
+    condition: "VDD=1.8V, VCM=0.9V, T=27°C"
+    measurement_method: "DC sweep INP, measure VIN at VOUT=VDD/2"
+    testbench: tb/tb_vos.sp
+
+  - name: VHYST
+    description: Input hysteresis voltage
+    units: mV
+    min: null
+    typ: 0
+    max: 2
+    condition: "VDD=1.8V, VCM=0.9V, T=27°C"
+    measurement_method: "VIN_fall - VIN_rise at VOUT=VDD/2 threshold"
+    testbench: tb/tb_vhyst.sp
+
+  - name: Idd
+    description: Supply current
+    units: uA
+    min: null
+    typ: 100
+    max: 300
+    condition: "VDD=1.8V, INP=INN=VDD/2, T=27°C, no load"
+    measurement_method: "Total supply current from VDD rail"
+    testbench: tb/tb_idd.sp
+
+  - name: VOH
+    description: Output high voltage
+    units: V
+    min: 1.6
+    typ: null
+    max: null
+    condition: "VDD=1.8V, INP=VDD, INN=0V, T=27°C"
+    measurement_method: "DC output voltage with INP >> INN"
+    testbench: tb/tb_swing.sp
+
+  - name: VOL
+    description: Output low voltage
+    units: V
+    min: null
+    typ: null
+    max: 0.2
+    condition: "VDD=1.8V, INP=0V, INN=VDD, T=27°C"
+    measurement_method: "DC output voltage with INP << INN"
+    testbench: tb/tb_swing.sp
