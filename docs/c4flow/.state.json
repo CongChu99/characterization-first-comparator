@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "currentState": "CODE_LOOP",
+  "feature": {
+    "name": "Characterization-First Comparator / Reference / Opamp Block",
+    "slug": "characterization-first-comparator",
+    "description": "Characterization-first comparator / reference / opamp block"
+  },
+  "mode": "research",
+  "startedAt": "2026-04-03",
+  "completedStates": ["RESEARCH", "SPEC", "DESIGN", "BEADS"],
+  "failedAttempts": 0,
+  "beadsEpic": "characterization-first-comparator-3be",
+  "doltRemote": null,
+  "worktree": null,
+  "prNumber": null,
+  "lastError": null,
+  "wikiUrl": null,
+  "wikiGitUrl": null
+}
