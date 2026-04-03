@@ -1,0 +1,14 @@
+# Python dependencies for the characterization pipeline
+# Install with: pip install -r requirements.txt
+
+# ngspice raw file parsing (metric extraction)
+spicelib>=1.1.0
+
+# Structured data handling (summary CSV, metric tables)
+pandas>=2.0
+
+# HTML report template rendering
+jinja2>=3.1
+
+# MC histogram plots and other visualizations in the report
+matplotlib>=3.7
