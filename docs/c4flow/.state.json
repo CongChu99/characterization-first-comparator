@@ -23,9 +23,9 @@
   "wikiUrl": null,
   "wikiGitUrl": null,
   "taskLoop": {
-    "currentTaskId": "characterization-first-comparator-3be.7",
-    "currentTaskSlug": "quiescent-current-and-output-swing-testbenches",
-    "currentBranch": "feat/characterization-first-comparator-3be.7-quiescent-current-and-output-swing-testbenches",
+    "currentTaskId": "characterization-first-comparator-3be.6",
+    "currentTaskSlug": "vos-hysteresis-testbenches",
+    "currentBranch": "feat/characterization-first-comparator-3be.6-vos-hysteresis-testbenches",
     "subState": "CODING",
     "completedTasks": [
       {
@@ -46,6 +46,10 @@
       },
       {
         "id": "characterization-first-comparator-3be.5",
+        "mergedAt": "2026-04-03"
+      },
+      {
+        "id": "characterization-first-comparator-3be.7",
         "mergedAt": "2026-04-03"
       }
     ],
