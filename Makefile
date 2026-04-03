@@ -48,7 +48,13 @@ mc: check-pdk-root validate-corners
 	@echo "[mc] Done. See results/mc/"
 
 extract: check-pdk-root
-	@echo "[extract] Not yet implemented — skipping."
+	@echo "[extract] Extracting metrics from simulation results..."
+	@mkdir -p results/extracted
+	@python3 scripts/extract/extract_metrics.py \
+		--spec specs/comparator_spec.yaml \
+		--results-dir results \
+		--output-dir results/extracted
+	@echo "[extract] Done. See results/extracted/"
 
 report:
 	@echo "[report] Not yet implemented — skipping."
