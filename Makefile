@@ -41,8 +41,11 @@ corners: check-pdk-root validate-corners
 	@bash scripts/run_corners.sh
 	@echo "[corners] Done. See results/corners/"
 
-mc: check-pdk-root
-	@echo "[mc] Not yet implemented — skipping."
+mc: check-pdk-root validate-corners
+	@echo "[mc] Running Monte Carlo sweep (>= 200 iterations × 5 testbenches)..."
+	@mkdir -p results/mc
+	@bash scripts/run_mc.sh
+	@echo "[mc] Done. See results/mc/"
 
 extract: check-pdk-root
 	@echo "[extract] Not yet implemented — skipping."
